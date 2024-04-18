@@ -55,13 +55,16 @@ interface Entity {
 }
 
 const entityName = "Category";
+
 export const Categories = (props: {}) => {
     const [displayModal, setDisplayModal] = useState(false);
     const [entity, setEntity] = useState<Entity | undefined>(undefined);
    
     // Usage of the the Apollo Client's useQuery & useMutation to interact with
     // our GraphQL API
+    // We use refetchQueries instead of caching the data for simplicty
     const { loading, error, data } = useQuery<AllEntity>(GET_ALL);
+    
     const [addEntity, { error: errorAdding }] = useMutation(ADD_ENTITY, {
       refetchQueries: [{ query: GET_ALL }]
     });
@@ -88,7 +91,6 @@ export const Categories = (props: {}) => {
         setDisplayModal(false);
         // Verifies if it's an update operation or if it should create a new entity
         // based on having an existing nodeId
-     
         if (entity?.nodeId) {
           updateEntity({
             variables: {
@@ -143,7 +145,7 @@ export const Categories = (props: {}) => {
                     onClose={() => setDisplayModal(false)}
                     onSave={handleSave}
                     enableSave={!!entity?.description}
-                    content={<EntityDetails entity={entity} setEntity={setEntity} />}
+                    content={<EntityDetails entity={entity} setEntity={setEntity}/>}
                 />
             )}
             <div className="flex flex-col">
@@ -210,9 +212,7 @@ const EntityDetails = (props: {
                 </label>
                 <input
                     type="text"
-                    onChange={(e) => 
-                        setEntity({ ...entity, description: e.target.value })   
-                    }
+                    onChange={(e) => setEntity({ ...entity, description: e.target.value })}
                     value={entity?.description || ""}
                     className="form-control block w-full rounded-lg mb-5"
                     id="description"
